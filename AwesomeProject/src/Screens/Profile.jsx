@@ -18,10 +18,14 @@ const Profile = ({route, navigation}) => {
       marginLeft: 55,
       fontSize: 22,
     },
+    backgroundImage: {
+      backgroundColor: '#3366ff',
+      height: '100%',
+    },
   });
 
   return (
-    <View>
+    <View style={styles.backgroundImage}>
       <Image source={imageSource} style={styles.myImage} />
       <Text style={styles.textStyling}>Hey {name} What's on your mind</Text>
     </View>

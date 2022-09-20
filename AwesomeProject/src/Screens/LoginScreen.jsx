@@ -1,24 +1,35 @@
-import React, {useState} from 'react';
+import react from 'react';
 import {
   Text,
-  View,
   TextInput,
+  View,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import {Formik} from 'formik';
+import * as yup from 'yup';
 
-function LoginScreen({navigation}) {
-  const [text, setText] = useState('');
-  const [password, setPassword] = useState('');
-
+const LoginScreen = ({navigation}) => {
+  const loginValidationSchema = yup.object().shape({
+    email: yup
+      .string()
+      .email('Please enter valid email')
+      .required('Email Address is Required'),
+    password: yup
+      .string()
+      .min(8, ({min}) => `Password must be at least ${min} characters`)
+      .required('Password is required'),
+  });
   const styles = StyleSheet.create({
     loginInput: {
-      fontSize: 20,
-      marginVertical: 10,
+      fontSize: 25,
+      marginVertical: 25,
+      paddingLeft: 15,
     },
     passwordInput: {
-      fontSize: 20,
-      marginVertical: 10,
+      fontSize: 25,
+      marginVertical: 20,
+      paddingLeft: 15,
     },
     loginBtn: {
       width: '80%',
@@ -33,28 +44,59 @@ function LoginScreen({navigation}) {
   });
 
   return (
-    <View style={{padding: 10}}>
-      <TextInput
-        style={styles.loginInput}
-        placeholder="Enter Email"
-        onChangeText={inputValue => setText(inputValue)}
-        value={text}
-      />
-      <TextInput
-        style={styles.passwordInput}
-        placeholder="Enter Password"
-        onChangeText={pswd => setPassword(pswd)}
-        value={password}
-      />
-      <TouchableOpacity
-        style={styles.loginBtn}
-        onPress={() => {
+    <View style={styles.loginContainer}>
+      <Formik
+        validationSchema={loginValidationSchema}
+        initialValues={{email: '', password: ''}}
+        onSubmit={() => {
           navigation.navigate('Home');
         }}>
-        <Text style={{fontSize: 25, color: 'white'}}>{'Login'}</Text>
-      </TouchableOpacity>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          isValid,
+        }) => (
+          <>
+            <TextInput
+              name="email"
+              placeholder="Email Address"
+              style={styles.loginInput}
+              onChangeText={handleChange('email')}
+              onBlur={handleBlur('email')}
+              value={values.email}
+              keyboardType="email-address"
+            />
+            {errors.email && (
+              <Text style={{fontSize: 10, color: 'red'}}>{errors.email}</Text>
+            )}
+            <TextInput
+              name="password"
+              placeholder="Password"
+              style={styles.passwordInput}
+              onChangeText={handleChange('password')}
+              onBlur={handleBlur('password')}
+              value={values.password}
+              secureTextEntry
+            />
+            {errors.password && (
+              <Text style={{fontSize: 10, color: 'red'}}>
+                {errors.password}
+              </Text>
+            )}
+            <TouchableOpacity
+              style={styles.loginBtn}
+              onPress={handleSubmit}
+              title="LOGIN"
+              disabled={!isValid}>
+              <Text style={{fontSize: 25, color: 'white'}}>Login</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </Formik>
     </View>
   );
-}
-
+};
 export default LoginScreen;
